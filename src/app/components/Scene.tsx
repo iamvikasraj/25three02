@@ -23,14 +23,16 @@ function BackgroundAnimator({ onColorChange }: { onColorChange: (color: string) 
     const duration = 1.5 // Same duration as card animation
     const progress = Math.min(elapsed / duration, 1)
 
-    // Same easing as card animation
-    const easeOut = 1 - Math.pow(1 - progress, 2)
+    // Same easing as card animation with overshoot
+    const easeOutOvershoot = progress < 1 
+      ? 1 - Math.pow(1 - progress, 2) + Math.sin(progress * Math.PI) * 0.1 * (1 - progress)
+      : 1
 
     // Interpolate between colors
     const startColor = new THREE.Color('#F2F3F7')
     const endColor = new THREE.Color('#1D07AE')
     
-    const currentColor = startColor.clone().lerp(endColor, easeOut)
+    const currentColor = startColor.clone().lerp(endColor, easeOutOvershoot)
     onColorChange(`#${currentColor.getHexString()}`)
 
     if (progress >= 1) {
@@ -75,21 +77,23 @@ function AnimatedCard({
     const duration = 1.5
     const progress = Math.min(elapsed / duration, 1)
 
-    // Simple easing function
-    const easeOut = 1 - Math.pow(1 - progress, 2)
+    // Easing function with overshoot
+    const easeOutOvershoot = progress < 1 
+      ? 1 - Math.pow(1 - progress, 2) + Math.sin(progress * Math.PI) * 0.1 * (1 - progress)
+      : 1
 
     // Animate position
     const newPosition: [number, number, number] = [
-      startPosition[0] + (endPosition[0] - startPosition[0]) * easeOut,
-      startPosition[1] + (endPosition[1] - startPosition[1]) * easeOut,
-      startPosition[2] + (endPosition[2] - startPosition[2]) * easeOut,
+      startPosition[0] + (endPosition[0] - startPosition[0]) * easeOutOvershoot,
+      startPosition[1] + (endPosition[1] - startPosition[1]) * easeOutOvershoot,
+      startPosition[2] + (endPosition[2] - startPosition[2]) * easeOutOvershoot,
     ]
 
     // Animate rotation
     const newRotation: [number, number, number] = [
-      endRotation[0] * easeOut,
-      endRotation[1] * easeOut,
-      endRotation[2] * easeOut,
+      endRotation[0] * easeOutOvershoot,
+      endRotation[1] * easeOutOvershoot,
+      endRotation[2] * easeOutOvershoot,
     ]
 
     setPosition(newPosition)
