@@ -5,6 +5,52 @@ import { OrbitControls, Environment } from '@react-three/drei'
 import { useRef, useState, useEffect } from 'react'
 import CreditCard from './CreditCard'
 
+function useResponsiveCamera() {
+  const [cameraSettings, setCameraSettings] = useState({
+    position: [0, 0, 7] as [number, number, number],
+    fov: 45
+  })
+
+  useEffect(() => {
+    const updateCamera = () => {
+      if (typeof window === 'undefined') return
+      
+      const isMobile = window.innerWidth < 768
+      const isTablet = window.innerWidth < 1024 && window.innerWidth >= 768
+      
+      if (isMobile) {
+        setCameraSettings({
+          position: [0, 0, 10],
+          fov: 35
+        })
+      } else if (isTablet) {
+        setCameraSettings({
+          position: [0, 0, 8],
+          fov: 40
+        })
+      } else {
+        setCameraSettings({
+          position: [0, 0, 7],
+          fov: 45
+        })
+      }
+    }
+
+    updateCamera()
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateCamera)
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', updateCamera)
+      }
+    }
+  }, [])
+
+  return cameraSettings
+}
+
 
 function AnimatedCard({ 
   startPosition, 
@@ -77,10 +123,13 @@ function AnimatedCard({
 }
 
 export default function Scene() {
+  const cameraSettings = useResponsiveCamera()
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+  
   return (
     <div className="h-screen w-full" style={{ backgroundColor: '#F2F3F7' }}>
       <Canvas 
-        camera={{ position: [0, 0, 10], fov: 35 }}
+        camera={{ position: cameraSettings.position, fov: cameraSettings.fov }}
         dpr={[1, 2]}
         performance={{ min: 0.5 }}
         gl={{ 
@@ -117,12 +166,12 @@ export default function Scene() {
 
         <OrbitControls 
           enablePan={false}
-          minDistance={3}
-          maxDistance={8}
+          minDistance={cameraSettings.position[2] - 2}
+          maxDistance={cameraSettings.position[2] + 3}
           minPolarAngle={Math.PI/3}
           maxPolarAngle={2*Math.PI/3}
           enableRotate={true}
-          rotateSpeed={0.5}
+          rotateSpeed={isMobile ? 0.3 : 0.5}
           autoRotate={false}
           enableDamping={true}
           dampingFactor={0.05}
