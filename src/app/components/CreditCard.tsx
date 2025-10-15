@@ -54,7 +54,9 @@ export default function CreditCard({ position = [0, 0, 0], variant = 'super-mone
     
     // Optimized floating animation - only update every 2 frames
     if (Math.floor(state.clock.elapsedTime * 30) % 2 === 0) {
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.01
+      // Limited rotation - much smaller range and slower speed
+      const rotationAmount = Math.sin(state.clock.elapsedTime * 0.2) * 0.005
+      meshRef.current.rotation.y = rotationAmount
     }
   })
 

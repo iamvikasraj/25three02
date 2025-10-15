@@ -156,6 +156,11 @@ export default function Scene() {
           maxDistance={8}
           minPolarAngle={Math.PI/3}
           maxPolarAngle={2*Math.PI/3}
+          enableRotate={true}
+          rotateSpeed={0.5}
+          autoRotate={false}
+          enableDamping={true}
+          dampingFactor={0.05}
         />
       </Canvas>
     </div>
