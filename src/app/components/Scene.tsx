@@ -119,7 +119,7 @@ export default function Scene() {
   return (
     <div className="h-screen w-full" style={{ backgroundColor: '#F2F3F7' }}>
       <Canvas 
-        camera={{ position: [0, 0, 7], fov: 45 }}
+        camera={{ position: [0, 0, 10], fov: 35 }}
         dpr={[1, 2]}
         performance={{ min: 0.5 }}
         gl={{ 
