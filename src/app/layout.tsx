@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SuperCard - Premium 3D Credit Cards",
-  description: "Experience premium credit cards in stunning 3D with smooth animations and realistic materials",
+  title: "SuperCard Experiment - Three.js Credit Card Showcase",
+  description: "Experimental Three.js project showcasing Super Money credit card designs with 3D animations and realistic materials",
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
