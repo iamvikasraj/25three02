@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "25three02 - 3D Credit Cards",
-  description: "Interactive 3D credit card showcase with beautiful animations",
+  title: "SuperCard - Premium 3D Credit Cards",
+  description: "Experience premium credit cards in stunning 3D with smooth animations and realistic materials",
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
