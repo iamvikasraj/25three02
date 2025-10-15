@@ -24,9 +24,9 @@ function BackgroundAnimator({ onColorChange }: { onColorChange: (color: string) 
     const progress = Math.min(elapsed / duration, 1)
 
     // Same easing as card animation with overshoot
-    const easeOutOvershoot = progress < 1 
-      ? progress === 0 ? 0 : Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1
-      : 1
+    const baseEase = 1 - Math.pow(1 - progress, 2)
+    const overshoot = Math.sin(progress * Math.PI * 1.2) * 0.15 * Math.pow(1 - progress, 3)
+    const easeOutOvershoot = progress < 1 ? baseEase + overshoot : 1
 
     // Interpolate between colors
     const startColor = new THREE.Color('#F2F3F7')
@@ -77,10 +77,10 @@ function AnimatedCard({
     const duration = 1.5
     const progress = Math.min(elapsed / duration, 1)
 
-    // Elastic easing with overshoot
-    const easeOutOvershoot = progress < 1 
-      ? progress === 0 ? 0 : Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1
-      : 1
+    // Subtle easing with light overshoot
+    const baseEase = 1 - Math.pow(1 - progress, 2)
+    const overshoot = Math.sin(progress * Math.PI * 1.2) * 0.15 * Math.pow(1 - progress, 3)
+    const easeOutOvershoot = progress < 1 ? baseEase + overshoot : 1
 
     // Animate position
     const newPosition: [number, number, number] = [
