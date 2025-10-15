@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { RoundedBox, Text } from '@react-three/drei'
+import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface CreditCardProps {

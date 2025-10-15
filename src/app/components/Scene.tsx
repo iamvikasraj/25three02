@@ -3,45 +3,8 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { useRef, useState, useEffect } from 'react'
-import * as THREE from 'three'
 import CreditCard from './CreditCard'
 
-function BackgroundAnimator({ onColorChange }: { onColorChange: (color: string) => void }) {
-  const startTime = useRef<number>(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-
-  useEffect(() => {
-    // Start immediately when component mounts (same as cards)
-    setIsAnimating(true)
-    startTime.current = Date.now()
-  }, [])
-
-  useFrame(() => {
-    if (!isAnimating) return
-
-    const elapsed = (Date.now() - startTime.current) / 1000
-    const duration = 1.5 // Same duration as card animation
-    const progress = Math.min(elapsed / duration, 1)
-
-    // Same easing as card animation with overshoot
-    const baseEase = 1 - Math.pow(1 - progress, 2)
-    const overshoot = Math.sin(progress * Math.PI * 1.2) * 0.15 * Math.pow(1 - progress, 3)
-    const easeOutOvershoot = progress < 1 ? baseEase + overshoot : 1
-
-    // Interpolate between colors
-    const startColor = new THREE.Color('#F2F3F7')
-    const endColor = new THREE.Color('#1D07AE')
-    
-    const currentColor = startColor.clone().lerp(endColor, easeOutOvershoot)
-    onColorChange(`#${currentColor.getHexString()}`)
-
-    if (progress >= 1) {
-      setIsAnimating(false)
-    }
-  })
-
-  return null
-}
 
 function AnimatedCard({ 
   startPosition, 
@@ -114,8 +77,6 @@ function AnimatedCard({
 }
 
 export default function Scene() {
-  const [showCards, setShowCards] = useState(true)
-
   return (
     <div className="h-screen w-full" style={{ backgroundColor: '#F2F3F7' }}>
       <Canvas 
