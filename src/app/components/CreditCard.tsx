@@ -1,56 +1,218 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { RoundedBox } from '@react-three/drei'
+import { RoundedBox, Text } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface CreditCardProps {
   position?: [number, number, number]
+  variant?: 'super-money' | 'axis-bank' | 'black-card'
+  rotation?: [number, number, number]
 }
 
-export default function CreditCard({ position = [0, 0, 0] }: CreditCardProps) {
+export default function CreditCard({ position = [0, 0, 0], variant = 'super-money', rotation = [0, 0, 0] }: CreditCardProps) {
   const meshRef = useRef<THREE.Mesh>(null)
+  
+  // Card dimensions - matching PNG aspect ratio (504x705)
+  const cardWidth = 2.1
+  const cardHeight = 2.94 // 2.1 * (705/504) to maintain aspect ratio
+  const cardThickness = 0.05
+  const detailsZPosition = cardThickness / 2 + 0.001 // Half thickness + small offset
+  
+  // Load the PNG texture based on variant
+  const [cardTexture, setCardTexture] = useState<THREE.Texture | null>(null)
+  
+  useEffect(() => {
+    const loader = new THREE.TextureLoader()
+    const texturePath = variant === 'super-money' ? '/Blue Card.png' : 
+                       variant === 'black-card' ? '/Black Card.png' : 
+                       '/Blue Card.png' // default fallback
+    
+    loader.load(
+      texturePath,
+      (texture) => {
+        console.log('Texture loaded:', texture)
+        texture.flipY = true
+        texture.wrapS = THREE.ClampToEdgeWrapping
+        texture.wrapT = THREE.ClampToEdgeWrapping
+        texture.repeat.set(1, 1)
+        texture.generateMipmaps = false
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        texture.anisotropy = 1
+        texture.needsUpdate = true
+        setCardTexture(texture)
+      },
+      undefined,
+      (error) => {
+        console.error('Failed to load texture:', error)
+      }
+    )
+  }, [variant])
 
   useFrame((state) => {
     if (!meshRef.current) return
     
-    // Add subtle hover effect
-    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.05
-    meshRef.current.rotation.y = Math.cos(state.clock.elapsedTime) * 0.05
+    // Optimized floating animation - only update every 2 frames
+    if (Math.floor(state.clock.elapsedTime * 30) % 2 === 0) {
+      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.01
+    }
   })
 
   return (
-    <mesh ref={meshRef} position={position}>
-      <RoundedBox args={[3.4, 2.1, 0.01]} radius={0.1} smoothness={4}>
-        {/* Front */}
-        <meshStandardMaterial attach="material-0" color="#ffffff" metalness={0.1} roughness={0.5} />
-        {/* Back */}
-        <meshStandardMaterial attach="material-1" color="#000000" metalness={0.1} roughness={0.5} />
-        {/* Edges */}
-        <meshPhysicalMaterial
-          attach="material-2"
-          color="#1a1a1a"
-          metalness={0.9}
-          roughness={0.3}
-        />
-        <meshPhysicalMaterial
-          attach="material-3"
-          color="#1a1a1a"
-          metalness={0.9}
-          roughness={0.3}
-        />
-        <meshPhysicalMaterial
-          attach="material-4"
-          color="#1a1a1a"
-          metalness={0.9}
-          roughness={0.3}
-        />
-        <meshPhysicalMaterial
-          attach="material-5"
-          color="#1a1a1a"
-          metalness={0.9}
-          roughness={0.3}
-        />
-      </RoundedBox>
+    <mesh ref={meshRef} position={position} rotation={rotation}>
+      <planeGeometry args={[cardWidth, cardHeight]} />
+      <meshStandardMaterial 
+        map={cardTexture}
+        color={cardTexture ? "#ffffff" : (variant === 'black-card' ? "#1a1a1a" : "#1e40af")}
+        side={THREE.DoubleSide}
+        transparent={true}
+        alphaTest={0.1}
+        metalness={0.8}
+        roughness={0.2}
+      />
+      
+      {/* Card Details - Hidden since PNG texture contains the design */}
+      <group position={[0, 0, detailsZPosition]} visible={false}>
+        {variant === 'super-money' ? (
+          <>
+            {/* Super Money Variant */}
+            {/* Chip */}
+            <mesh position={[-0.8, 1.2, 0]}>
+              <planeGeometry args={[0.3, 0.25]} />
+              <meshStandardMaterial
+                color="#FFD700"
+                metalness={0.8}
+                roughness={0.2}
+              />
+            </mesh>
+
+            {/* Super Money Logo */}
+            <Text
+              position={[-0.8, 0.8, 0]}
+              fontSize={0.12}
+              color="white"
+              anchorX="left"
+            >
+              super. money
+            </Text>
+
+            {/* RuPay Logo */}
+            <Text
+              position={[-0.8, -1.2, 0]}
+              fontSize={0.1}
+              color="white"
+              anchorX="left"
+            >
+              RuPay
+            </Text>
+
+            {/* QR Code */}
+            <mesh position={[0.6, -1.2, 0]}>
+              <planeGeometry args={[0.5, 0.5]} />
+              <meshStandardMaterial
+                color="#000000"
+                metalness={0.1}
+                roughness={0.8}
+              />
+            </mesh>
+
+            {/* Contactless Symbol */}
+            <Text
+              position={[0.8, 1.2, 0]}
+              fontSize={0.12}
+              color="white"
+              anchorX="right"
+            >
+              )))
+            </Text>
+
+            {/* Vertical SUPER Text */}
+            <Text
+              position={[0.9, 0, 0]}
+              fontSize={0.25}
+              color="white"
+              anchorX="center"
+              rotation={[0, 0, Math.PI / 2]}
+            >
+              SUPER
+            </Text>
+          </>
+        ) : (
+          <>
+            {/* Axis Bank Variant */}
+            {/* Chip */}
+            <mesh position={[-0.8, 1.2, 0]}>
+              <planeGeometry args={[0.3, 0.25]} />
+              <meshStandardMaterial
+                color="#FFD700"
+                metalness={0.8}
+                roughness={0.2}
+              />
+            </mesh>
+
+            {/* Global Company Logo */}
+            <mesh position={[-0.8, 0.8, 0]}>
+              <planeGeometry args={[0.2, 0.2]} />
+              <meshStandardMaterial color="white" />
+            </mesh>
+
+            {/* Axis Bank Logo */}
+            <Text
+              position={[-0.8, 0.5, 0]}
+              fontSize={0.08}
+              color="white"
+              anchorX="left"
+            >
+              Axis Bank
+            </Text>
+
+            {/* Tap to Pay Symbol */}
+            <Text
+              position={[0.8, 1.2, 0]}
+              fontSize={0.12}
+              color="white"
+              anchorX="right"
+            >
+              )))
+            </Text>
+
+            {/* RuPay Logo */}
+            <Text
+              position={[-0.8, -1.2, 0]}
+              fontSize={0.1}
+              color="white"
+              anchorX="left"
+            >
+              RuPay
+            </Text>
+
+            {/* Vertical SUPER Text */}
+            <Text
+              position={[0.9, 0, 0]}
+              fontSize={0.25}
+              color="white"
+              anchorX="center"
+              rotation={[0, 0, Math.PI / 2]}
+            >
+              SUPER
+            </Text>
+
+            {/* GM Logo */}
+            <mesh position={[0, -1.5, 0]}>
+              <planeGeometry args={[0.15, 0.15]} />
+              <meshStandardMaterial color="#1e40af" />
+            </mesh>
+            <Text
+              position={[0, -1.5, 0.001]}
+              fontSize={0.08}
+              color="white"
+              anchorX="center"
+            >
+              GM
+            </Text>
+          </>
+        )}
+      </group>
     </mesh>
   )
 } 
