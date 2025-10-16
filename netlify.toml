@@ -1,6 +1,6 @@
 [build]
-  command = "npm run netlify-build"
-  publish = "out"
+  publish = "dist"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -10,7 +10,6 @@
   to = "/index.html"
   status = 200
 
-[dev]
-  command = "npm run dev"
-  port = 3000
-  publish = "out"
+# Preview deployments only
+[context.deploy-preview]
+  command = "npm run build"
