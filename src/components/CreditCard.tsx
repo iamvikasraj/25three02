@@ -23,14 +23,20 @@ export default function CreditCard({ position = [0, 0, 0], variant = 'super-mone
   
   useEffect(() => {
     const loader = new THREE.TextureLoader()
-    const texturePath = variant === 'super-money' ? '/Blue Card.png' : 
-                       variant === 'black-card' ? '/Black Card.png' : 
-                       '/Blue Card.png' // default fallback
+    
+    // Try WebP first, fallback to PNG
+    const webpPath = variant === 'super-money' ? '/Blue Card.webp' : 
+                    variant === 'black-card' ? '/Black Card.webp' : 
+                    '/Blue Card.webp'
+    
+    const pngPath = variant === 'super-money' ? '/Blue Card.png' : 
+                   variant === 'black-card' ? '/Black Card.png' : 
+                   '/Blue Card.png'
     
     loader.load(
-      texturePath,
+      webpPath,
       (texture) => {
-        console.log('Texture loaded:', texture)
+        console.log('WebP texture loaded:', texture)
         texture.flipY = true
         texture.wrapS = THREE.ClampToEdgeWrapping
         texture.wrapT = THREE.ClampToEdgeWrapping
@@ -44,7 +50,28 @@ export default function CreditCard({ position = [0, 0, 0], variant = 'super-mone
       },
       undefined,
       (error) => {
-        console.error('Failed to load texture:', error)
+        console.log('WebP failed, trying PNG fallback:', error)
+        // Fallback to PNG
+        loader.load(
+          pngPath,
+          (texture) => {
+            console.log('PNG texture loaded:', texture)
+            texture.flipY = true
+            texture.wrapS = THREE.ClampToEdgeWrapping
+            texture.wrapT = THREE.ClampToEdgeWrapping
+            texture.repeat.set(1, 1)
+            texture.generateMipmaps = false
+            texture.minFilter = THREE.LinearFilter
+            texture.magFilter = THREE.LinearFilter
+            texture.anisotropy = 1
+            texture.needsUpdate = true
+            setCardTexture(texture)
+          },
+          undefined,
+          (pngError) => {
+            console.error('Both WebP and PNG failed:', pngError)
+          }
+        )
       }
     )
   }, [variant])
