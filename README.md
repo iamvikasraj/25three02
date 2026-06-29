@@ -1,4 +1,4 @@
-# SuperCard Experiment - React Three Fiber
+# SuperCard 3D - React Three Fiber
 
 A 3D credit card showcase built with React Three Fiber, featuring animated Super Money and Black Card designs with realistic materials and lighting.
 
@@ -32,7 +32,7 @@ A 3D credit card showcase built with React Three Fiber, featuring animated Super
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd 25three02
+cd supercard-3d
 ```
 
 2. Install dependencies:
